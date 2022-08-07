@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/style.css}">
+    <title>Book List</title>
+</head>
+<body>
+
+<div class="container">
+    <h2>Book List</h2>
+    <form class="header" th:action="@{/book}" method="post" th:object="${bookObject}">
+        <input type="text" id="input" placeholder="New Item..." th:field="*{name}">
+        <button type="submit" class="addBtn">Add</button>
+    </form>
+    <ul th:each="book: ${bookList}">
+    	<input type="text" th:id="name + ${book.id}" th:value="*{book.name}">
+	    <button type="submit" class="updateBtn" th:onclick="'javascript:updateBook(event, this, ' + ${book.id} + ')'">Update</button>
+	    <button type="submit" class="deleteBtn" th:onclick="'javascript:deleteBook(event, this, ' + ${book.id} + ')'" >Delete</button>
+    	<br>    	
+    </ul>
+</div>
+
+<script>
+    const updateBook = (event, element, id) => {        
+        let name = document.getElementById('name' + id).value;
+        const data = {
+			id: id,
+            name: name
+        }
+        fetch('/book/'+ id, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data),
+        }).then(function(response) {
+        	location.reload();        
+        })
+    }
+
+    const deleteBook = (event, element, id) => {
+        event.stopPropagation();
+        fetch('/book/'+ id, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        }).then(function(response) {
+             element.parentNode.parentNode.parentNode.removeChild(element.parentNode.parentNode);
+             location.reload();
+       	})
+    }
+</script>
+
+</body>
+</html>
